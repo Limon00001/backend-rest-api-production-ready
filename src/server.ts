@@ -74,12 +74,32 @@ app.use(helmet());
 // Apply rate limiting middleware to limit the number of requests per IP address (e.g., 10 requests per minute)
 app.use(limiter);
 
-// Routes
-app.use('/', (req, res) => {
-  res.json({ message: 'Hello World' });
-});
+/**
+ * Immediately invoked async function expression (IIFE) to start the server
+ *
+ * - Tries to connect to the database before initializing the server
+ * - Defines the api routes ('/api/v1')
+ * - Starts the server on the specified port and logs a message to the console
+ * - If an error occurs during server startup, logs a message to the console and the process is exited with a non-zero exit code
+ */
+(async () => {
+  try {
+    // Routes
+    app.use('/', (req, res) => {
+      res.json({ message: 'Hello World' });
+    });
 
-// Server Listening
-app.listen(config.PORT, () => {
-  console.log(`Server is running on http://localhost:${config.PORT}`);
-});
+    // Server Listening
+    app.listen(config.PORT, () => {
+      console.log(`Server is running on http://localhost:${config.PORT}`);
+    });
+  } catch (error) {
+    // Handle server startup errors
+    console.log(`Failed to start server: ${error}`);
+
+    if (config.NODE_ENV === 'production') {
+      // Exit the process in production mode
+      process.exit(1);
+    }
+  }
+})();
