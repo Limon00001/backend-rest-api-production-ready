@@ -15,6 +15,7 @@ import helmet from 'helmet';
 // Internal Imports
 import config from '@/config';
 import limiter from '@/lib/express_rate_limit';
+import v1Routes from './routes/v1';
 
 // Types
 import type { CorsOptions } from 'cors';
@@ -85,9 +86,7 @@ app.use(limiter);
 (async () => {
   try {
     // Routes
-    app.use('/', (req, res) => {
-      res.json({ message: 'Hello World' });
-    });
+    app.use('/api/v1', v1Routes);
 
     // Server Listening
     app.listen(config.PORT, () => {
@@ -95,7 +94,7 @@ app.use(limiter);
     });
   } catch (error) {
     // Handle server startup errors
-    console.log(`Failed to start server: ${error}`);
+    console.error(`Failed to start server: ${error}`);
 
     if (config.NODE_ENV === 'production') {
       // Exit the process in production mode
@@ -103,3 +102,29 @@ app.use(limiter);
     }
   }
 })();
+
+/**
+ * Handles server shutdown gracefully by disconnecting from the database
+ *
+ * - Attempts to disconnect from the database before shutting down the server
+ * - If an error occurs during database disconnection, logs a message to the console and the process is exited with `0` status code (indicates successful shutdown)
+ */
+const handleServerShutdown = async () => {
+  try {
+    console.log('Shutting down server...');
+    process.exit(0);
+  } catch (error) {
+    // Handle database disconnection errors
+    console.error(`Failed to disconnect from database: ${error}`);
+  }
+};
+
+/**
+ * Event listeners to terminate the server gracefully when receiving `SIGINT` or `SIGTERM` signals
+ *
+ * - `SIGINT` signal is sent when the user interrupts the process by pressing Ctrl+C
+ * - `SIGTERM` signal is sent when the process is terminated (e.g., using the `kill` command or container termination)
+ * - When either signal is received, the `handleServerShutdown` function is called to gracefully shut down the server
+ */
+process.on('SIGINT', handleServerShutdown);
+process.on('SIGTERM', handleServerShutdown);
