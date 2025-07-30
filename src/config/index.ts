@@ -14,6 +14,8 @@ dotenv.config();
 // Config Object
 const config = {
   PORT: process.env.PORT || 5000,
+  NODE_ENV: process.env.NODE_ENV || 'development',
+  WHITELIST_ORIGINS: [process.env.WHITELIST_ORIGINS],
 };
 
 // Export
