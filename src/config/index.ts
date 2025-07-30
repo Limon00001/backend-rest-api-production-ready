@@ -17,6 +17,7 @@ const config = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   WHITELIST_ORIGINS: [process.env.WHITELIST_ORIGINS],
   MONGO_URI: process.env.MONGO_URI,
+  LOG_LEVEL: process.env.LOG_LEVEL || 'info',
 };
 
 // Export

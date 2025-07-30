@@ -10,6 +10,7 @@ import mongoose from 'mongoose';
 
 // Internal Imports
 import config from '@/config';
+import { logger } from '@/lib/winston';
 
 // Types
 import type { ConnectOptions } from 'mongoose';
@@ -42,7 +43,7 @@ const connectToDatabase = async (): Promise<void> => {
   try {
     // Event listener for successful database connection
     mongoose.connection.on('connected', () =>
-      console.log('Database connected successfully!', {
+      logger.info('Database connected successfully!', {
         uri: config.MONGO_URI,
         options: clientOptions,
       }),
@@ -53,7 +54,7 @@ const connectToDatabase = async (): Promise<void> => {
 
     // Event listener for database disconnection
     mongoose.connection.on('error', (err) =>
-      console.log(`Database connection error: ${err}`),
+      logger.error(`Database connection error: ${err}`),
     );
   } catch (error) {
     // Rethrow the error if it is an instance of `Error`
@@ -61,7 +62,7 @@ const connectToDatabase = async (): Promise<void> => {
       throw error;
     }
 
-    console.error(`Error connecting to database: ${error}`);
+    logger.error(`Error connecting to database: ${error}`);
   }
 };
 
@@ -76,7 +77,7 @@ const disconnectFromDatabase = async (): Promise<void> => {
   try {
     await mongoose.disconnect();
 
-    console.log('Database disconnected successfully!', {
+    logger.info('Database disconnected successfully!', {
       uri: config.MONGO_URI,
       options: clientOptions,
     });
@@ -86,7 +87,7 @@ const disconnectFromDatabase = async (): Promise<void> => {
       throw new Error(error.message);
     }
 
-    console.error(`Error disconnecting from database: ${error}`);
+    logger.error(`Error disconnecting from database: ${error}`);
   }
 };
 
