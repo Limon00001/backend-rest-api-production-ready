@@ -6,11 +6,15 @@
  */
 
 // External Imports
+import compression from 'compression';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
+import helmet from 'helmet';
 
 // Internal Imports
 import config from '@/config';
+import limiter from '@/lib/express_rate_limit';
 
 // Types
 import type { CorsOptions } from 'cors';
@@ -52,6 +56,23 @@ app.use(express.json());
 // Enable URL Encoded Body Parsing with Extended Options
 // 'extended: true' allows rich objects and arrays via query strings
 app.use(express.urlencoded({ extended: true }));
+
+// Enable Cookie Parsing Middleware to parse cookies from requests and attach them to the request object
+app.use(cookieParser());
+
+// Compression Middleware
+// Enable response compression to reduce payload size and improve performance
+app.use(
+  compression({
+    threshold: 1024, // Only compress responses larger than 1kb
+  }),
+);
+
+// Use Helmet Middleware to secure HTTP headers
+app.use(helmet());
+
+// Apply rate limiting middleware to limit the number of requests per IP address (e.g., 10 requests per minute)
+app.use(limiter);
 
 // Routes
 app.use('/', (req, res) => {
