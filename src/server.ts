@@ -15,7 +15,8 @@ import helmet from 'helmet';
 // Internal Imports
 import config from '@/config';
 import limiter from '@/lib/express_rate_limit';
-import v1Routes from './routes/v1';
+import { connectToDatabase, disconnectFromDatabase } from '@/lib/mongoose';
+import v1Routes from '@/routes/v1';
 
 // Types
 import type { CorsOptions } from 'cors';
@@ -85,6 +86,9 @@ app.use(limiter);
  */
 (async () => {
   try {
+    // Database Connection
+    await connectToDatabase();
+
     // Routes
     app.use('/api/v1', v1Routes);
 
@@ -111,6 +115,8 @@ app.use(limiter);
  */
 const handleServerShutdown = async () => {
   try {
+    // Database Disconnection
+    await disconnectFromDatabase();
     console.log('Shutting down server...');
     process.exit(0);
   } catch (error) {
