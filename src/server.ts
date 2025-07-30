@@ -8,10 +8,13 @@
 // External Imports
 import express from 'express';
 
+// Internal Imports
+import config from '@/config';
+
 // Express App
 const app = express();
 
 // Server Listening
-app.listen(5001, () => {
-  console.log('Server is running on http://localhost:5001');
+app.listen(config.PORT, () => {
+  console.log(`Server is running on http://localhost:${config.PORT}`);
 });
