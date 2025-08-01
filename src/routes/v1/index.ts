@@ -8,6 +8,9 @@
 // External Imports
 import { Router } from 'express';
 
+// Internal Imports
+import authRoues from '@/routes/v1/auth';
+
 // Router Instance
 const router = Router();
 
@@ -21,6 +24,9 @@ router.get('/', (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// Routes
+router.use('/auth', authRoues);
 
 // Export
 export default router;
