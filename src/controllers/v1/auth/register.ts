@@ -7,12 +7,30 @@
 
 // Internal Imports
 import { logger } from '@/lib/winston';
+import { User } from '@/models/User';
+import { generateRandomUsername } from '@/utils';
 
 // Types
+import { IUser } from '@/models/User';
 import type { Request, Response } from 'express';
 
-const resgister = async (req: Request, res: Response) => {
+// User Registration Data Type
+// This type is used to define the structure of the user data that will be registered.
+type UserData = Pick<IUser, 'email' | 'password' | 'role'>;
+
+const register = async (req: Request, res: Response) => {
+  const { email, password, role } = req.body as UserData;
+
   try {
+    const username = generateRandomUsername();
+
+    const user = await User.create({
+      username,
+      email,
+      password,
+      role,
+    });
+
     res.status(201).json({
       message: 'User registered successfully.',
     });
@@ -28,4 +46,4 @@ const resgister = async (req: Request, res: Response) => {
 };
 
 // Export
-export default resgister;
+export default register;

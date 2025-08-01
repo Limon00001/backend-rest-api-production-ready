@@ -9,12 +9,12 @@
 import { Router } from 'express';
 
 // Internal Imports
-import resgister from '@/controllers/v1/auth/register';
+import register from '@/controllers/v1/auth/register';
 
 // Router Instance
 const router = Router();
 
-router.post('/register', resgister);
+router.post('/register', register);
 
 // Export
 export default router;
