@@ -1,74 +1,63 @@
 /**
  * Author: Monayem Hossain Limon
  * GitHub: https://github.com/Limon00001
- * Date: 01 Aug, 2025
+ * Date: 02 Aug, 2025
  * @copyright 2025 monayem_hossain_limon
  */
 
 // Internal Imports
+import config from '@/config';
 import { generateAccessToken, generateRefreshToken } from '@/lib/jwt';
 import { logger } from '@/lib/winston';
 import Token from '@/models/Token';
 import { User } from '@/models/User';
-import { generateRandomUsername } from '@/utils';
 
 // Types
-import config from '@/config';
 import { IUser } from '@/models/User';
 import type { Request, Response } from 'express';
 
-// User Registration Data Type
-// This type is used to define the structure of the user data that will be registered.
+// User Login Data Type
 type UserData = Pick<IUser, 'email' | 'password' | 'role'>;
 
-// User Registration Function
-const register = async (req: Request, res: Response) => {
-  const { email, password, role } = req.body as UserData;
-
-  // Validate role
-  if (role === 'admin' && !config.WHITELIST_ADMINS_MAIL.includes(email)) {
-    // Log the attempt to register as admin without permission
-    logger.warn(
-      `User with email ${email} tried to register as admin without permission.`,
-    );
-
-    // If the user is trying to register as an admin but their email is not whitelisted, return an error.
-    // This is a security measure to prevent unauthorized users from gaining admin access.
-    return res.status(403).json({
-      code: 'AuthorizationError',
-      message: 'You are not allowed to register as an admin.',
-    });
-  }
+// User Login Function
+const login = async (req: Request, res: Response) => {
+  const { email } = req.body as UserData;
 
   try {
-    // Generate a random username
-    const username = generateRandomUsername();
+    /**
+     * Find a user by email and return selected fields (username, email, role, password)
+     * Converts result to a plain JS object for better performance (no Mongoose document overhead)
+     */
+    const user = await User.findOne({ email })
+      .select('username email role password')
+      .lean()
+      .exec();
 
-    // Create a new user
-    const newUser = await User.create({
-      username,
-      email,
-      password,
-      role,
-    });
+    // If user not found, return an error
+    if (!user) {
+      return res.status(404).json({
+        code: 'NotFound',
+        message: 'User not found',
+      });
+    }
 
     /**
      * Generate Access and Refresh Tokens
      * These tokens are generated for the newly created user to manage authentication and session.
      * Access tokens are typically used for short-lived sessions, while refresh tokens are used to obtain new access tokens without requiring the user to log in again.
      */
-    const accessToken = generateAccessToken(newUser._id);
-    const refreshToken = generateRefreshToken(newUser._id);
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
 
     // Store the refresh token in the database
     await Token.create({
       token: refreshToken,
-      userId: newUser._id,
+      userId: user._id,
     });
 
     // Log the successful creation of the refresh token
     logger.info('Refresh token created successfully', {
-      userId: newUser._id,
+      userId: user._id,
       token: refreshToken,
     });
 
@@ -91,20 +80,16 @@ const register = async (req: Request, res: Response) => {
     // Respond with the user data and access token
     res.status(201).json({
       user: {
-        username: newUser.username,
-        email: newUser.email,
-        role: newUser.role,
+        username: user.username,
+        email: user.email,
+        role: user.role,
       },
       accessToken,
     });
 
-    // Log the successful registration
-    // This log entry is useful for tracking user registrations and debugging issues related to user creation.
-    logger.info('User registered successfully', {
-      username: newUser.username,
-      email: newUser.email,
-      role: newUser.role,
-    });
+    // Log the successful login
+    // This log entry is useful for tracking user logins and debugging issues related to user authentication.
+    logger.info('User logged in successfully', user);
   } catch (error) {
     res.status(500).json({
       code: 'ServerError',
@@ -112,9 +97,9 @@ const register = async (req: Request, res: Response) => {
       error: error,
     });
 
-    logger.error('Error occurred during user registration:', error);
+    logger.error('Error occurred during user login:', error);
   }
 };
 
 // Export
-export default register;
+export default login;
