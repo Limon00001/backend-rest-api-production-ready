@@ -8,10 +8,11 @@
 // External Imports
 import bcryptjs from 'bcryptjs';
 import { Router } from 'express';
-import { body } from 'express-validator';
+import { body, cookie } from 'express-validator';
 
 // Internal Imports
 import login from '@/controllers/v1/auth/login';
+import refreshToken from '@/controllers/v1/auth/refresh_token';
 import register from '@/controllers/v1/auth/register';
 import validationErrors from '@/middlewares/validationErrors';
 import { User } from '@/models/User';
@@ -117,6 +118,17 @@ router.post(
     }),
   validationErrors,
   login,
+);
+
+router.post(
+  '/refresh-token',
+  cookie('refreshToken')
+    .notEmpty()
+    .withMessage('Refresh token is required')
+    .isJWT()
+    .withMessage('Invalid refresh token'),
+  validationErrors,
+  refreshToken,
 );
 
 // Export
