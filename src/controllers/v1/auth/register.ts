@@ -24,9 +24,26 @@ type UserData = Pick<IUser, 'email' | 'password' | 'role'>;
 const register = async (req: Request, res: Response) => {
   const { email, password, role } = req.body as UserData;
 
+  // Validate role
+  if (role === 'admin' && !config.WHITELIST_ADMINS_MAIL.includes(email)) {
+    // Log the attempt to register as admin without permission
+    logger.warn(
+      `User with email ${email} tried to register as admin without permission.`,
+    );
+
+    // If the user is trying to register as an admin but their email is not whitelisted, return an error.
+    // This is a security measure to prevent unauthorized users from gaining admin access.
+    return res.status(403).json({
+      code: 'AuthorizationError',
+      message: 'You are not allowed to register as an admin.',
+    });
+  }
+
   try {
+    // Generate a random username
     const username = generateRandomUsername();
 
+    // Create a new user
     const newUser = await User.create({
       username,
       email,
