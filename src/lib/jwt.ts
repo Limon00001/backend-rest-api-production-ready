@@ -38,5 +38,29 @@ const generateAccessToken = (userId: Types.ObjectId): string => {
   });
 };
 
+const generateRefreshToken = (userId: Types.ObjectId): string => {
+  // Validate userId
+  if (!userId) {
+    throw new Error('User ID is required to generate a refresh token.');
+  }
+
+  // Check if JWT secret is set
+  if (
+    !config.JWT_REFRESH_SECRET ||
+    typeof config.JWT_REFRESH_SECRET !== 'string'
+  ) {
+    throw new Error('JWT refresh secret is not set or is not a string.');
+  }
+  if (typeof config.REFRESH_TOKEN_EXPIRY !== 'string') {
+    throw new Error('Refresh token expiry must be a string.');
+  }
+
+  // Generate Refresh Token
+  return jwt.sign({ userId }, config.JWT_REFRESH_SECRET, {
+    expiresIn: config.REFRESH_TOKEN_EXPIRY,
+    subject: 'refreshToken',
+  });
+};
+
 // Export
-export { generateAccessToken };
+export { generateAccessToken, generateRefreshToken };
