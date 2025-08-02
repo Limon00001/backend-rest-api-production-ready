@@ -6,7 +6,8 @@
  */
 
 // External Imports
-import { Schema, model } from 'mongoose';
+import bcryptjs from 'bcryptjs';
+import { CallbackError, Schema, model } from 'mongoose';
 
 // Types
 interface IUser {
@@ -117,6 +118,22 @@ const userSchema = new Schema<IUser>(
     timestamps: true,
   },
 );
+
+userSchema.pre('save', async function (next) {
+  // Check if the password is modified
+  if (!this.isModified('password')) {
+    return next();
+  }
+
+  // If the password is modified, hash it
+  try {
+    // Hash the password before saving the user
+    this.password = await bcryptjs.hash(this.password, 10);
+    next();
+  } catch (error) {
+    next(error as CallbackError);
+  }
+});
 
 // Create User Model
 const User = model<IUser>('User', userSchema);
