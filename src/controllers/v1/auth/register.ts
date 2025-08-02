@@ -6,6 +6,7 @@
  */
 
 // Internal Imports
+import config from '@/config';
 import { generateAccessToken, generateRefreshToken } from '@/lib/jwt';
 import { logger } from '@/lib/winston';
 import Token from '@/models/Token';
@@ -13,7 +14,6 @@ import { User } from '@/models/User';
 import { generateRandomUsername } from '@/utils';
 
 // Types
-import config from '@/config';
 import { IUser } from '@/models/User';
 import type { Request, Response } from 'express';
 
@@ -83,9 +83,6 @@ const register = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: config.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: config.REFRESH_TOKEN_EXPIRY
-        ? parseInt(config.REFRESH_TOKEN_EXPIRY)
-        : 7 * 24 * 60 * 60 * 1000, // Default to 7 days if not set
     });
 
     // Respond with the user data and access token
