@@ -8,6 +8,7 @@
 // Internal Imports
 import { generateAccessToken, generateRefreshToken } from '@/lib/jwt';
 import { logger } from '@/lib/winston';
+import Token from '@/models/Token';
 import { User } from '@/models/User';
 import { generateRandomUsername } from '@/utils';
 
@@ -40,6 +41,18 @@ const register = async (req: Request, res: Response) => {
      */
     const accessToken = generateAccessToken(newUser._id);
     const refreshToken = generateRefreshToken(newUser._id);
+
+    // Store the refresh token in the database
+    await Token.create({
+      token: refreshToken,
+      userId: newUser._id,
+    });
+
+    // Log the successful creation of the refresh token
+    logger.info('Refresh token created successfully', {
+      userId: newUser._id,
+      token: refreshToken,
+    });
 
     /**
      * Set the refresh token in a secure, HTTP-only cookie
