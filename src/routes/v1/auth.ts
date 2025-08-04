@@ -12,8 +12,10 @@ import { body, cookie } from 'express-validator';
 
 // Internal Imports
 import login from '@/controllers/v1/auth/login';
+import logout from '@/controllers/v1/auth/logout';
 import refreshToken from '@/controllers/v1/auth/refresh_token';
 import register from '@/controllers/v1/auth/register';
+import authenticate from '@/middlewares/authenticate';
 import validationErrors from '@/middlewares/validationErrors';
 import { User } from '@/models/User';
 
@@ -130,6 +132,8 @@ router.post(
   validationErrors,
   refreshToken,
 );
+
+router.post('/logout', authenticate, logout);
 
 // Export
 export default router;
