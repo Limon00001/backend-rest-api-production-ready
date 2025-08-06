@@ -9,7 +9,8 @@
 import { Router } from 'express';
 
 // Internal Imports
-import authRoues from '@/routes/v1/auth';
+import authRoutes from '@/routes/v1/auth';
+import userRoutes from '@/routes/v1/user';
 
 // Router Instance
 const router = Router();
@@ -26,7 +27,8 @@ router.get('/', (req, res) => {
 });
 
 // Routes
-router.use('/auth', authRoues);
+router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
 
 // Export
 export default router;
