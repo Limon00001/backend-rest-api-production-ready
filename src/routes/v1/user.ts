@@ -7,7 +7,7 @@
 
 // External Imports
 import { Router } from 'express';
-import { body } from 'express-validator';
+import { body, query } from 'express-validator';
 
 // Internal Imports
 import deleteCurrentUser from '@/controllers/v1/user/delete_current_user';
@@ -114,7 +114,21 @@ router.delete(
  * @route GET /v1/users
  * @access Admin
  */
-router.get('/', authenticate, authorize(['admin']), getAllUser);
+router.get(
+  '/',
+  authenticate,
+  authorize(['admin']),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 50 })
+    .withMessage('Limit must be between 1 and 50'),
+  query('offset')
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('Offset must be a non-negative integer'),
+  validationErrors,
+  getAllUser,
+);
 
 // Export
 export default router;

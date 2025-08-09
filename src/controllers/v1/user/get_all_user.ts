@@ -23,9 +23,9 @@ const getAllUser = async (req: Request, res: Response) => {
     // Get limit and offset from query parameters
     // If not provided, use default values from config
     // Use parseInt to convert string to number, and provide default values if not present
-    const limit = parseInt(req.query.limit as string) ?? config.DefaultResLimit;
+    const limit = parseInt(req.query.limit as string) || config.DefaultResLimit;
     const offset =
-      parseInt(req.query.offset as string) ?? config.DefaultResOffset;
+      parseInt(req.query.offset as string) || config.DefaultResOffset;
 
     // Get total number of users
     const total = await User.countDocuments();
