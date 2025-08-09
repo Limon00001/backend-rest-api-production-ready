@@ -28,6 +28,8 @@ const config = {
     process.env.WHITELIST_ADMINS_MAIL_1,
     process.env.WHITELIST_ADMINS_MAIL_2,
   ],
+  DefaultResLimit: 20,
+  DefaultResOffset: 0,
 };
 
 // Export
