@@ -10,6 +10,7 @@ import { Router } from 'express';
 
 // Internal Imports
 import getCurrentUser from '@/controllers/v1/user/get_current_user';
+import updateCurrentUser from '@/controllers/v1/user/update_current_user';
 import authenticate from '@/middlewares/authenticate';
 import authorize from '@/middlewares/authorize';
 
@@ -22,6 +23,12 @@ router.get(
   authenticate,
   authorize(['user', 'admin']),
   getCurrentUser,
+);
+router.put(
+  '/current',
+  authenticate,
+  authorize(['user', 'admin']),
+  updateCurrentUser,
 );
 
 // Export
