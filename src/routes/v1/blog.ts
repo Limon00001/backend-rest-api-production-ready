@@ -7,11 +7,12 @@
 
 // External Imports
 import { Router } from 'express';
-import { body } from 'express-validator';
+import { body, query } from 'express-validator';
 import multer from 'multer';
 
 // Internal Imports
 import createBlog from '@/controllers/v1/blog/create_blog';
+import getAllBlogs from '@/controllers/v1/blog/get_all_blogs';
 import authenticate from '@/middlewares/authenticate';
 import authorize from '@/middlewares/authorize';
 import uploadBlogBanner from '@/middlewares/uploadBlogBanner';
@@ -29,7 +30,6 @@ router.post(
   authenticate,
   authorize(['admin']),
   upload.single('banner_image'),
-  body('banner_image').notEmpty().withMessage('Banner image is required'),
   body('title')
     .trim()
     .notEmpty()
@@ -44,6 +44,22 @@ router.post(
   validationErrors,
   uploadBlogBanner('post'),
   createBlog,
+);
+
+router.get(
+  '/',
+  authenticate,
+  authorize(['user', 'admin']),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 50 })
+    .withMessage('Limit must be between 1 and 50'),
+  query('offset')
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('Offset must be a non-negative integer'),
+  validationErrors,
+  getAllBlogs,
 );
 
 // Export
