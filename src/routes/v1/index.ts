@@ -10,6 +10,7 @@ import { Router } from 'express';
 
 // Internal Imports
 import authRoutes from '@/routes/v1/auth';
+import blogRoutes from '@/routes/v1/blog';
 import userRoutes from '@/routes/v1/user';
 
 // Router Instance
@@ -29,6 +30,7 @@ router.get('/', (req, res) => {
 // Routes
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
+router.use('/blogs', blogRoutes);
 
 // Export
 export default router;
