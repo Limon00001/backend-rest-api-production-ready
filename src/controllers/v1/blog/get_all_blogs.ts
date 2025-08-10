@@ -46,13 +46,13 @@ const getAllBlogs = async (req: Request, res: Response) => {
     // Create query object
     const query: QueryType = {};
 
-    // Get total number of blogs
-    const total = await Blog.countDocuments(query);
-
     // Show only published blogs to a normal user
     if (user?.role === 'user') {
       query.status = 'published';
     }
+
+    // Get total number of blogs
+    const total = await Blog.countDocuments(query);
 
     /**
      * Find all blogs with pagination
