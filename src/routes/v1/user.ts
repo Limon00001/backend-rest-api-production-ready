@@ -7,12 +7,13 @@
 
 // External Imports
 import { Router } from 'express';
-import { body, query } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 // Internal Imports
 import deleteCurrentUser from '@/controllers/v1/user/delete_current_user';
 import getAllUser from '@/controllers/v1/user/get_all_user';
 import getCurrentUser from '@/controllers/v1/user/get_current_user';
+import getUser from '@/controllers/v1/user/get_user';
 import updateCurrentUser from '@/controllers/v1/user/update_current_user';
 import authenticate from '@/middlewares/authenticate';
 import authorize from '@/middlewares/authorize';
@@ -128,6 +129,15 @@ router.get(
     .withMessage('Offset must be a non-negative integer'),
   validationErrors,
   getAllUser,
+);
+
+router.get(
+  '/:userId',
+  authenticate,
+  authorize(['admin']),
+  param('userId').isMongoId().withMessage('Invalid user ID'),
+  validationErrors,
+  getUser,
 );
 
 // Export
