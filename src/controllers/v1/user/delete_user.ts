@@ -12,20 +12,18 @@ import { User } from '@/models/User';
 // Types
 import type { Request, Response } from 'express';
 
-// Controller Function to get all users
-/** * Controller to get all users.
+/**
+ * Controller to delete a user by ID.
  * @param {Request} req - Express request object
  * @param {Response} res - Express response object
  */
-const getUser = async (req: Request, res: Response) => {
-  try {
-    // Get user ID from request
-    const { userId } = req.params;
+const deleteUser = async (req: Request, res: Response) => {
+  // Get user ID from request
+  const { userId } = req.params;
 
-    // Find user by ID
-    // Exclude the Mongoose version key (__v) from the result
-    // `.exec()`: Executes the query and returns a Promise
-    const user = await User.findById(userId).select('-__v').exec();
+  try {
+    // Delete user by ID
+    const user = await User.deleteOne({ _id: userId });
 
     // Check if user exists
     if (!user) {
@@ -35,14 +33,11 @@ const getUser = async (req: Request, res: Response) => {
       });
     }
 
-    // Return the user data
-    res.status(200).json({
-      code: 'Success',
-      user,
-    });
+    // Return a 204 No Content response
+    res.sendStatus(204);
   } catch (error) {
     // Log the error for debugging purposes
-    logger.error('Error fetching user:', error);
+    logger.error('Error deleting user:', error);
 
     // Return a 500 Internal Server Error response
     return res.status(500).json({
@@ -54,4 +49,4 @@ const getUser = async (req: Request, res: Response) => {
 };
 
 // Export
-export default getUser;
+export default deleteUser;
