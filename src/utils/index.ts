@@ -17,5 +17,24 @@ const generateRandomUsername = (): string => {
   return `${userNamePrefix}${randomSuffix}`;
 };
 
+/**
+ * Generate a random slug from a title (e.g., my-title-abc123)
+ * @param title The title to generate the slug from.
+ * @returns The random slug.
+ */
+const genSlug = (title: string): string => {
+  // This function generates a random slug from a title by removing special characters, replacing spaces with hyphens, and appending a random string.
+  const slug = title
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]\s-/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+
+  const randomSuffix = Math.random().toString(36).slice(2);
+
+  return `${slug}-${randomSuffix}`;
+};
+
 // Export the utility function
-export { generateRandomUsername };
+export { generateRandomUsername, genSlug };

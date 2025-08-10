@@ -8,6 +8,9 @@
 // External Imports
 import { Schema, Types, model } from 'mongoose';
 
+// Internal Imports
+import { genSlug } from '@/utils';
+
 // Types
 interface IBlog {
   title: string;
@@ -96,6 +99,14 @@ const blogSchema = new Schema<IBlog>(
     },
   },
 );
+
+blogSchema.pre('validate', function (next) {
+  if (this.title && !this.slug) {
+    this.slug = genSlug(this.title);
+  }
+
+  next();
+});
 
 // Create Blog Model
 const Blog = model<IBlog>('Blog', blogSchema);
