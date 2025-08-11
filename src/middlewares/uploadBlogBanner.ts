@@ -8,6 +8,7 @@
 // Internal Imports
 import uploadToCloudinary from '@/lib/cloudinary';
 import { logger } from '@/lib/winston';
+import { Blog } from '@/models/Blog';
 
 // Types
 import type { UploadApiErrorResponse } from 'cloudinary';
@@ -41,21 +42,21 @@ const uploadBlogBanner = (method: 'post' | 'put') => {
     }
 
     try {
-      // const { blogId } = req.params;
-      // const blog = await Blog.findById(blogId).select('banner.publicId').exec();
+      const { blogId } = req.params;
+      const blog = await Blog.findById(blogId).select('banner.publicId').exec();
 
       // Upload the file to Cloudinary
       const data = await uploadToCloudinary(
         req.file.buffer,
-        // blog?.banner.publicId.replace('blog-api/', ''),
+        blog?.banner.publicId.replace('blog-api/', ''),
       );
 
       // Check if the upload was successful or not
       if (!data) {
         // Log the error for debugging purposes
         logger.error('Error uploading file to Cloudinary.', {
-          // blogId,
-          // publicId: blog?.banner.publicId
+          blogId,
+          publicId: blog?.banner.publicId,
         });
 
         // Return a 500 Internal Server Error response
@@ -75,7 +76,7 @@ const uploadBlogBanner = (method: 'post' | 'put') => {
 
       // Log the success for debugging purposes
       logger.info('File uploaded to Cloudinary.', {
-        // blogId,
+        blogId,
         banner: newBanner,
       });
 
