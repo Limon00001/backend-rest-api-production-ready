@@ -12,10 +12,10 @@ import { JSDOM } from 'jsdom';
 // Internal Imports
 import { logger } from '@/lib/winston';
 import { Blog } from '@/models/Blog';
+import { User } from '@/models/User';
 
 // Types
 import type { IBlog } from '@/models/Blog';
-import { User } from '@/models/User';
 import type { Request, Response } from 'express';
 
 type BlogData = Partial<Pick<IBlog, 'title' | 'content' | 'banner' | 'status'>>;
