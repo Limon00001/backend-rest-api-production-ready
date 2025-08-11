@@ -19,8 +19,8 @@ interface QueryType {
   status?: 'draft' | 'published';
 }
 
-// Controller Function to get all users
-/** * Controller to get all users.
+// Controller Function to get all blogs
+/** * Controller to get all blogs.
  * @param {Request} req - Express request object
  * @param {Response} res - Express response object
  */

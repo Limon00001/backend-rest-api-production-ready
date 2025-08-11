@@ -11,6 +11,7 @@ import { Router } from 'express';
 // Internal Imports
 import authRoutes from '@/routes/v1/auth';
 import blogRoutes from '@/routes/v1/blog';
+import likeRoutes from '@/routes/v1/like';
 import userRoutes from '@/routes/v1/user';
 
 // Router Instance
@@ -31,6 +32,7 @@ router.get('/', (req, res) => {
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/blogs', blogRoutes);
+router.use('/likes', likeRoutes);
 
 // Export
 export default router;

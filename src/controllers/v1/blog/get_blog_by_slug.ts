@@ -13,8 +13,8 @@ import { User } from '@/models/User';
 // Types
 import type { Request, Response } from 'express';
 
-// Controller Function to get blogs by user
-/** * Controller to get blogs by user.
+// Controller Function to get blogs by the slug
+/** * Controller to get blogs by slug.
  * @param {Request} req - Express request object
  * @param {Response} res - Express response object
  */

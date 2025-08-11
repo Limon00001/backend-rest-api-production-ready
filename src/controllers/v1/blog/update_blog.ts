@@ -25,7 +25,7 @@ const window = new JSDOM('').window;
 const purify = DOMPurify(window);
 
 /**
- * Create a new blog post
+ * Update a new blog post
  */
 const updateBlog = async (req: Request, res: Response) => {
   try {

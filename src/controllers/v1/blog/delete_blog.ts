@@ -17,7 +17,7 @@ import { User } from '@/models/User';
 import type { Request, Response } from 'express';
 
 /**
- * Create a new blog post
+ * Delete a new blog post
  */
 const deleteBlog = async (req: Request, res: Response) => {
   try {
