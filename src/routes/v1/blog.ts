@@ -13,6 +13,7 @@ import multer from 'multer';
 // Internal Imports
 import createBlog from '@/controllers/v1/blog/create_blog';
 import getAllBlogs from '@/controllers/v1/blog/get_all_blogs';
+import getBlogBySlug from '@/controllers/v1/blog/get_blog_by_slug';
 import getBlogsByUser from '@/controllers/v1/blog/get_blogs_by_user';
 import authenticate from '@/middlewares/authenticate';
 import authorize from '@/middlewares/authorize';
@@ -78,6 +79,15 @@ router.get(
     .withMessage('Offset must be a non-negative integer'),
   validationErrors,
   getBlogsByUser,
+);
+
+router.get(
+  '/:slug',
+  authenticate,
+  authorize(['user', 'admin']),
+  param('slug').notEmpty().withMessage('Slug is required'),
+  validationErrors,
+  getBlogBySlug,
 );
 
 // Export
