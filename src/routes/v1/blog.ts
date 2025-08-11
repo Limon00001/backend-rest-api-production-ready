@@ -7,12 +7,13 @@
 
 // External Imports
 import { Router } from 'express';
-import { body, query } from 'express-validator';
+import { body, param, query } from 'express-validator';
 import multer from 'multer';
 
 // Internal Imports
 import createBlog from '@/controllers/v1/blog/create_blog';
 import getAllBlogs from '@/controllers/v1/blog/get_all_blogs';
+import getBlogsByUser from '@/controllers/v1/blog/get_blogs_by_user';
 import authenticate from '@/middlewares/authenticate';
 import authorize from '@/middlewares/authorize';
 import uploadBlogBanner from '@/middlewares/uploadBlogBanner';
@@ -60,6 +61,23 @@ router.get(
     .withMessage('Offset must be a non-negative integer'),
   validationErrors,
   getAllBlogs,
+);
+
+router.get(
+  '/user/:userId',
+  authenticate,
+  authorize(['user', 'admin']),
+  param('userId').isMongoId().withMessage('Invalid user ID'),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 50 })
+    .withMessage('Limit must be between 1 and 50'),
+  query('offset')
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('Offset must be a non-negative integer'),
+  validationErrors,
+  getBlogsByUser,
 );
 
 // Export

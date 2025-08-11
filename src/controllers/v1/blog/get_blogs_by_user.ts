@@ -1,7 +1,7 @@
 /**
  * Author: Monayem Hossain Limon
  * GitHub: https://github.com/Limon00001
- * Date: 10 Aug, 2025
+ * Date: 11 Aug, 2025
  * @copyright 2025 monayem_hossain_limon
  */
 
@@ -19,14 +19,17 @@ interface QueryType {
   status?: 'draft' | 'published';
 }
 
-// Controller Function to get all users
-/** * Controller to get all users.
+// Controller Function to get blogs by user
+/** * Controller to get blogs by user.
  * @param {Request} req - Express request object
  * @param {Response} res - Express response object
  */
-const getAllBlogs = async (req: Request, res: Response) => {
-  // Get user ID from request
-  const userId = req.userId;
+const getBlogsByUser = async (req: Request, res: Response) => {
+  // Get user ID from request params
+  const userId = req.params.userId;
+
+  // Get current user ID
+  const currentUserId = req.userId;
 
   try {
     // Get limit and offset from query parameters
@@ -41,18 +44,21 @@ const getAllBlogs = async (req: Request, res: Response) => {
      * Use lean() to return a plain JavaScript object instead of a Mongoose document
      * This improves performance and reduces memory usage
      */
-    const user = await User.findById(userId).select('role').lean().exec();
+    const currentUser = await User.findById(currentUserId)
+      .select('role')
+      .lean()
+      .exec();
 
     // Create query object
     const query: QueryType = {};
 
     // Show only published blogs to a normal user
-    if (user?.role === 'user') {
+    if (currentUser?.role === 'user') {
       query.status = 'published';
     }
 
-    // Get total number of blogs
-    const total = await Blog.countDocuments(query);
+    // Get total number of blogs for the user and query
+    const total = await Blog.countDocuments({ author: userId, ...query });
 
     /**
      * Find all blogs with pagination
@@ -61,7 +67,7 @@ const getAllBlogs = async (req: Request, res: Response) => {
      * Use lean() to return a plain JavaScript object instead of a Mongoose document
      * Use sort({ createdAt: -1 }) to sort by created at in descending order
      */
-    const blogs = await Blog.find(query)
+    const blogs = await Blog.find({ author: userId, ...query })
       .select('-banner.publicId -__v') // Exclude version from the response
       .populate('author', '-createdAt -updatedAt -__v')
       .limit(limit)
@@ -81,7 +87,7 @@ const getAllBlogs = async (req: Request, res: Response) => {
     });
   } catch (error) {
     // Log the error for debugging purposes
-    logger.error('Error fetching blogs:', error);
+    logger.error('Error fetching blogs by user:', error);
 
     // Return a 500 Internal Server Error response
     return res.status(500).json({
@@ -93,4 +99,4 @@ const getAllBlogs = async (req: Request, res: Response) => {
 };
 
 // Export
-export default getAllBlogs;
+export default getBlogsByUser;
