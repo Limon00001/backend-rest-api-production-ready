@@ -11,10 +11,11 @@ import { JSDOM } from 'jsdom';
 
 // Internal Imports
 import { logger } from '@/lib/winston';
+import { Blog } from '@/models/Blog';
+import { Comment } from '@/models/Comment';
 
 // Types
-import { Blog } from '@/models/Blog';
-import { Comment, type IComment } from '@/models/Comment';
+import type { IComment } from '@/models/Comment';
 import type { Request, Response } from 'express';
 
 type CommentData = Pick<IComment, 'content'>;
@@ -31,8 +32,10 @@ const commentBlog = async (req: Request, res: Response): Promise<void> => {
   const userId = req.userId;
 
   try {
+    // Find the blog by ID and select the commentsCount field
     const blog = await Blog.findById(blogId).select('_id commentsCount').exec();
 
+    // Check if the blog exists
     if (!blog) {
       res.status(404).json({
         code: 'NotFound',
@@ -41,24 +44,32 @@ const commentBlog = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    // Clean the content using DOMPurify
     const cleanContent = purify.sanitize(content);
 
+    // Create a new comment
     const newComment = await Comment.create({
       blogId,
       content: cleanContent,
       userId,
     });
 
+    // Log the comment creation
     logger.info('Comment created successfully', newComment);
 
+    // Update the commentsCount field
     blog.commentsCount++;
+
+    // Save the blog
     await blog.save();
 
+    // Log the comments count update
     logger.info('Blog comments count updated', {
       blogId: blog._id,
       commentsCount: blog.commentsCount,
     });
 
+    // Send a success response
     res.status(201).json({
       comment: newComment,
     });
