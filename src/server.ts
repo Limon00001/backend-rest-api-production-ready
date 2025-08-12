@@ -16,7 +16,7 @@ import helmet from 'helmet';
 import config from '@/config';
 import limiter from '@/lib/express_rate_limit';
 import { connectToDatabase, disconnectFromDatabase } from '@/lib/mongoose';
-import { logger } from '@/lib/winston';
+import { logger, logtail } from '@/lib/winston';
 import v1Routes from '@/routes/v1';
 
 // Types
@@ -119,6 +119,7 @@ const handleServerShutdown = async () => {
     // Database Disconnection
     await disconnectFromDatabase();
     logger.warn('Shutting down server...');
+    await logtail.flush(); // Ensure all logs are sent before shutting down
     process.exit(0);
   } catch (error) {
     // Handle database disconnection errors

@@ -6,6 +6,8 @@
  */
 
 // External Imports
+import { Logtail } from '@logtail/node';
+import { LogtailTransport } from '@logtail/winston';
 import winston from 'winston';
 
 // Internal Imports
@@ -17,6 +19,21 @@ const { combine, timestamp, printf, errors, json, colorize, align } =
 
 // Define the transports array to hold different logging transports
 const transports: winston.transport[] = [];
+
+// Create a new Logtail instance
+const logtail = new Logtail(config.LOGTAIL_SOURCE_TOKEN, {
+  endpoint: `https://${config.LOGTAIL_INGESTING_HOST}`,
+});
+
+if (config.NODE_ENV === 'production') {
+  if (!config.LOGTAIL_SOURCE_TOKEN || !config.LOGTAIL_INGESTING_HOST) {
+    throw new Error(
+      'Logtail source token and ingesting host are required in configuration.',
+    );
+  }
+
+  transports.push(new LogtailTransport(logtail));
+}
 
 // If application is not running in production mode, add a console transport
 if (process.env.NODE_ENV !== 'production') {
@@ -46,5 +63,5 @@ const logger = winston.createLogger({
   silent: config.NODE_ENV === 'test', // Disable logging in test mode
 });
 
-// Export the logger
-export { logger };
+// Export
+export { logger, logtail };

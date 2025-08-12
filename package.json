@@ -29,6 +29,8 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@logtail/node": "^0.5.5",
+    "@logtail/winston": "^0.5.5",
     "@types/express": "^5.0.3",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.7.0",
