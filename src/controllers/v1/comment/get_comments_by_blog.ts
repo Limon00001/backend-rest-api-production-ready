@@ -13,7 +13,7 @@ import { Comment } from '@/models/Comment';
 // Types
 import type { Request, Response } from 'express';
 
-// Controller Function to comment on a blog
+// Controller Function to get comments by blog
 const getCommentsByBlog = async (
   req: Request,
   res: Response,
